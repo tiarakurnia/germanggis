@@ -11,19 +11,24 @@ class OrderController extends Controller
     // Menampilkan daftar pesanan
     public function index()
     {
-        // Mengambil semua pesanan yang belum dikonfirmasi
-        $orders = Order::where('status', 'pending')->get(); // Bisa disesuaikan dengan status pesanan Anda
+        // Mengambil semua pesanan dan urutkan berdasarkan status (pending di atas, confirmed di bawah)
+        $orders = Order::with('user', 'facility') // Mengambil relasi user dan facility
+            ->orderByRaw("FIELD(status, 'pending') DESC") // Menampilkan 'pending' terlebih dahulu
+            ->orderBy('created_at', 'desc') // Pesanan terbaru di atas
+            ->get();
 
-        return view('admin.orders.index', compact('orders'));
+        return view('admin.orders.index', compact('orders')); // Mengembalikan view dengan data pesanan
     }
 
     // Konfirmasi pesanan
     public function confirm(Order $order)
     {
-        // Perbarui status pesanan menjadi 'confirmed'
-        $order->status = 'confirmed';
-        $order->save();
+        // Update status pesanan menjadi 'confirmed'
+        $order->update([
+            'status' => 'confirmed',
+            'updated_at' => now(), // Memastikan waktu pembaruan juga diperbarui
+        ]);
 
-        return redirect()->route('admin.orders.index')->with('success', 'Pesanan telah dikonfirmasi.');
+        return redirect()->route('admin.orders.index')->with('success', 'Pesanan telah dikonfirmasi!'); // Redirect dengan pesan sukses
     }
 }

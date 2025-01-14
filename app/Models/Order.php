@@ -10,13 +10,22 @@ class Order extends Model
     use HasFactory;
 
     protected $fillable = [
-        'name',
-        'price',
+        'user_id',
+        'facility_id',
         'quantity',
         'total',
+        'order_date',
         'booking_date',
-        'image',
-        'description',
         'status',
     ];
+
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function facility()
+    {
+        return $this->belongsTo(Facility::class);
+    }
 }

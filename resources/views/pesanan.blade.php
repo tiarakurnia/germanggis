@@ -13,19 +13,19 @@
                 </div>
             @endif
 
-            @if (count($orders) > 0)
+            @if ($orders->count() > 0)
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                     @foreach ($orders as $order)
                         <div class="bg-white shadow-lg rounded-lg p-6">
-                            <img src="{{ $order['image'] }}" alt="{{ $order['name'] }}"
-                                class="w-full h-48 object-cover rounded-lg mb-4">
-                            <h3 class="text-xl font-bold">{{ $order['name'] }}</h3>
-                            <p class="text-sm text-gray-700 mb-2">{{ $order['description'] }}</p>
-                            <p class="text-lg font-bold">Rp{{ number_format($order['price'], 0, ',', '.') }} x
-                                {{ $order['quantity'] }}</p>
-                            <p class="text-lg font-bold mt-2">Total: Rp{{ number_format($order['total'], 0, ',', '.') }}</p>
-                            @if ($order['booking_date'])
-                                <p class="text-sm text-gray-500 mt-2">Tanggal: {{ $order['booking_date'] }}</p>
+                            <img src="{{ asset('storage/facilities/' . $order->facility->image) }}"
+                                alt="{{ $order->facility->name }}" class="w-full h-48 object-cover rounded-lg mb-4">
+                            <h3 class="text-xl font-bold">{{ $order->facility->name }}</h3>
+                            <p class="text-sm text-gray-700 mb-2">{{ $order->facility->description }}</p>
+                            <p class="text-lg font-bold">Rp{{ number_format($order->price, 0, ',', '.') }} x
+                                {{ $order->quantity }}</p>
+                            <p class="text-lg font-bold mt-2">Total: Rp{{ number_format($order->total, 0, ',', '.') }}</p>
+                            @if ($order->booking_date)
+                                <p class="text-sm text-gray-500 mt-2">Tanggal: {{ $order->booking_date }}</p>
                             @endif
                         </div>
                     @endforeach

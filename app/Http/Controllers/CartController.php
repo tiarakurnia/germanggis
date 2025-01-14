@@ -4,99 +4,166 @@ namespace App\Http\Controllers;
 
 use App\Models\Cart;
 use App\Models\Facility;
+use App\Models\Order;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Log;
+use Midtrans\Snap;
 
 class CartController extends Controller
 {
     public function index()
     {
+        // Mengambil semua item di keranjang untuk pengguna yang sedang login
         $cart = Cart::with('facility')->where('user_id', Auth::id())->get();
+        
+        // Menghitung total harga semua item di keranjang
         $total = $cart->sum(function ($item) {
             return $item->facility->price * $item->quantity;
         });
 
+        // Mengembalikan view keranjang dengan data item dan total
         return view('cart.index', compact('cart', 'total'));
     }
-
+    
     public function removeItem($id)
     {
+        // Mencari item di keranjang berdasarkan ID dan user_id
         $item = Cart::where('id', $id)->where('user_id', Auth::id())->first();
 
         if ($item) {
+            // Menghapus item dari keranjang
             $item->delete();
             return back()->with('success', 'Item berhasil dihapus.');
         }
 
         return back()->with('error', 'Item tidak ditemukan.');
     }
-
-    public function addItem(Request $request)
+    public function add(Request $request)
     {
+        // Validasi input
         $request->validate([
-            'facility_id' => 'required|exists:facilities,id',
+            'facility_id' => 'required|integer|exists:facilities,id', 
             'quantity' => 'required|integer|min:1',
+            'booking_date' => 'required|date',
         ]);
 
+        // Mencari fasilitas berdasarkan ID
         $facility = Facility::find($request->facility_id);
 
-        Cart::create([
-            'user_id' => Auth::id(),
-            'facility_id' => $facility->id,
-            'quantity' => $request->quantity,
-        ]);
+        // Logika untuk menambahkan item ke keranjang di database
+        // Cek apakah item sudah ada di keranjang
+        $cartItem = Cart::where('user_id', auth()->id())
+                        ->where('facility_id', $facility->id)
+                        ->where('booking_date', $request->booking_date) // Cek tanggal pemesanan
+                        ->first();
 
-        return back()->with('success', 'Item berhasil ditambahkan ke keranjang.');
+        if ($cartItem) {
+            // Jika item sudah ada, update quantity
+            $cartItem->quantity += $request->quantity;
+            $cartItem->save();
+        } else {
+            // Jika item belum ada, buat item baru di keranjang
+            Cart::create([
+                'user_id' => auth()->id(),
+                'facility_id' => $facility->id,
+                'name' => $facility->name,
+                'price' => $facility->price,
+                'quantity' => $request->quantity,
+                'booking_date' => $request->booking_date,
+            ]);
+        }
+
+        return response()->json(['success' => true]);
     }
 
     public function checkout(Request $request)
     {
-        if ($request->expectsJson()) {
-            // Ambil data keranjang pengguna
-            $cart = Cart::with('facility')->where('user_id', Auth::id())->get();
+        // Setup Midtrans
+        \Midtrans\Config::$serverKey = config('midtrans.serverKey');
+        \Midtrans\Config::$isProduction = config('midtrans.isProduction');
+        \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
+        \Midtrans\Config::$is3ds = config('midtrans.is3ds');
 
-            // Cek apakah keranjang kosong
-            if ($cart->isEmpty()) {
-                return response()->json(['error' => 'Keranjang kosong.'], 400);
+        // Mengambil nama pengguna
+        $nameParts = explode(' ', Auth::user()->name, 2);
+        $firstName = $nameParts[0];
+        $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
+
+        // Menyiapkan detail transaksi
+        $transactionDetails = [
+            'order_id' => 'ORDER-' . uniqid(),
+            'gross_amount' => $request->total_amount,
+        ];
+
+        // Menyiapkan detail item
+        $itemDetails = [];
+        foreach ($request->items as $item) {
+            $facility = Facility::find($item['facility_id']);
+        
+            // Pastikan fasilitas ditemukan
+            if (!$facility) {
+                return response()->json(['error' => 'Fasilitas tidak ditemukan.'], 404);
             }
-
-            // Hitung total harga
-            $total = $cart->sum(fn($item) => $item->facility->price * $item->quantity);
-
-            // Setup Midtrans
-            \Midtrans\Config::$serverKey = config('midtrans.serverKey');
-            \Midtrans\Config::$isProduction = config('midtrans.isProduction');
-            \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
-            \Midtrans\Config::$is3ds = config('midtrans.is3ds');
-
-            // Parameter transaksi
-            $params = [
-                'transaction_details' => [
-                    'order_id' => uniqid(),
-                    'gross_amount' => $total,
-                ],
-                'customer_details' => [
-                    'first_name' => Auth::user()->name,
-                    'email' => Auth::user()->email,
-                ],
+        
+            $itemDetails[] = [
+                'id' => uniqid(),
+                'price' => $item['price'],
+                'quantity' => $item['quantity'],
+                'name' => $facility->name, // Mengambil nama dari database
             ];
-
-            // Coba dapatkan Snap Token dari Midtrans
-            try {
-                $snapToken = \Midtrans\Snap::getSnapToken($params);
-                return response()->json(['snapToken' => $snapToken]);
-            } catch (\Exception $e) {
-                Log::error('Midtrans error: ' . $e->getMessage());
-                return response()->json(['error' => 'Gagal memproses pembayaran.'], 500);
-            }
         }
+    
+        // Menyiapkan detail pelanggan
+        $customerDetails = [
+            'first_name' => $firstName,
+            'last_name' => $lastName,
+            'email' => Auth::user()->email,
+        ];
 
-        // Jika bukan permintaan JSON, kembalikan error
-        return back()->with('error', 'Permintaan tidak valid.');
+        // Data untuk Snap
+        $params = [
+            'transaction_details' => $transactionDetails,
+            'item_details' => $itemDetails,
+            'customer_details' => $customerDetails,
+        ];
+
+        try {
+            // Dapatkan Snap Token
+            $snapToken = Snap::getSnapToken($params);
+
+            // Simpan pesanan ke database
+            foreach ($request->items as $item) {
+                // Ambil fasilitas berdasarkan ID
+                $facility = Facility::find($item['facility_id']);
+
+                // Pastikan fasilitas ditemukan
+                if (!$facility) {
+                    return response()->json(['error' => 'Fasilitas tidak ditemukan.'], 404);
+                }
+                Order::create([
+                    'user_id' => Auth::id(), // Menyimpan ID pengguna
+                    'facility_id' => $item['facility_id'], // Menyimpan ID fasilitas
+                    'price' => $item['price'],
+                    'quantity' => $item['quantity'],
+                    'total' => $item['price'] * $item['quantity'],
+                    'status' => 'pending',
+                    'booking_date' => $item['booking_date'], // Simpan tanggal pemesanan
+                ]);
+            }
+
+            // Mengembalikan Snap Token sebagai respons JSON
+            return response()->json(['snapToken' => $snapToken]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
     }
-    public function success()
+    public function clearCart()
     {
-        return view('success');
+        // Menghapus semua item di keranjang untuk pengguna yang sedang login
+        Cart::where('user_id', Auth::id())->delete();
+
+        return redirect()->route('cart.index')->with('success', 'Keranjang berhasil dikosongkan.');
     }
 }

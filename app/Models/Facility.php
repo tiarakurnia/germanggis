@@ -11,16 +11,19 @@ class Facility extends Model
 
     protected $fillable = [
         'name',
-        'category_id', // Ganti dengan category_id, karena kamu menyimpan ID kategori
+        'category_id',
         'description',
         'price',
-        'image', // Jangan lupa tambahkan 'image' jika kamu menyimpan gambar
+        'image',
     ];
 
-    // Relasi dengan Category
     public function category()
     {
         return $this->belongsTo(Category::class);
     }
-}
 
+    public function orders()
+    {
+        return $this->hasMany(Order::class);
+    }
+}

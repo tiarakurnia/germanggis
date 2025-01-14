@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Midtrans\Config;
 use Midtrans\Snap;
 use Illuminate\Support\Facades\Log;
+use App\Models\Order; 
 
 class MidtransController extends Controller
 {
@@ -72,7 +73,6 @@ class MidtransController extends Controller
         try {
             // Buat Snap Token dari Midtrans
             $snapToken = Snap::getSnapToken($transactionData);
-
             return response()->json(['snapToken' => $snapToken]);
         } catch (\Exception $e) {
             Log::error('Midtrans Error: ' . $e->getMessage());
@@ -88,6 +88,7 @@ class MidtransController extends Controller
         $transactionStatus = $notification->transaction_status;
         $orderId = $notification->order_id;
 
+        // Update status transaksi berdasarkan status yang diterima
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             // Update status transaksi menjadi berhasil
             Log::info("Transaksi berhasil: {$orderId}");

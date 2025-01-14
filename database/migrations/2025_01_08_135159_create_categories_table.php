@@ -11,8 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->string('role')->default('user'); // Default role 'user'
+        Schema::create('categories', function (Blueprint $table) {
+            $table->id(); // Auto-incrementing ID
+            $table->string('name'); // Name of the category
+            $table->timestamps(); // Created at and updated at
         });
     }
 
@@ -21,8 +23,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::table('users', function (Blueprint $table) {
-            $table->dropColumn('role');
-        });
+        Schema::dropIfExists('categories');
     }
 };

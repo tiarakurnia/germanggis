@@ -12,13 +12,13 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('facilities', function (Blueprint $table) {
-            $table->id();
-            $table->string('name');
-            $table->foreignId('category_id')->constrained('categories')->onDelete('cascade');
-            $table->text('description')->nullable();
-            $table->decimal('price', 10, 2);
-            $table->string('image')->nullable(); // Jika ingin menyimpan gambar
-            $table->timestamps();
+            $table->id(); // Auto-incrementing ID
+            $table->string('name'); // Facility name
+            $table->foreignId('category_id')->constrained('categories'); // Foreign key to categories
+            $table->text('description'); // Facility description
+            $table->decimal('price', 10, 2); // Facility price
+            $table->string('image')->nullable(); // Facility image
+            $table->timestamps(); // Created at and updated at
         });
     }
 

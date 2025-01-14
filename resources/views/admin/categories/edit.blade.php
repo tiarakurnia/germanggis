@@ -11,8 +11,11 @@
 
             <div>
                 <label for="name" class="block text-lg font-medium text-gray-700">Nama Kategori</label>
-                <input type="text" name="name" id="name" value="{{ $category->name }}"
+                <input type="text" name="name" id="name" value="{{ old('name', $category->name) }}"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                @error('name')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
             <button type="submit"

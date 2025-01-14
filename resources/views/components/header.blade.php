@@ -15,7 +15,7 @@
                     <a href="{{ route('home') }}" class="hover:underline hover:text-accent transition">Beranda</a>
                     <a href="{{ route('wahana') }}" class="hover:underline hover:text-accent transition">Wahana</a>
                     <a href="{{ route('fasilitas') }}" class="hover:underline hover:text-accent transition">Fasilitas</a>
-                    <a href="{{ route('keranjang') }}"  class="hover:underline hover:text-accent transition">
+                    <a href="{{ route('keranjang') }}" class="hover:underline hover:text-accent transition">
                         <i class="fa-solid fa-cart-shopping"></i>
                     </a>
                     <a href="{{ route('pesanan') }}" class="hover:underline hover:text-accent transition">
@@ -23,45 +23,32 @@
                     </a>
 
                     <!-- User Dropdown -->
-                    @if (Auth::check())
-                        <div class="relative">
-                            <!-- Trigger Button -->
-                            <button class="hover:underline focus:outline-none focus:ring-2 focus:ring-accent transition"
-                                id="dropdownButton">
-                                {{ Auth::user()->name }}
-                            </button>
-                            <!-- Dropdown Menu -->
-                            <div class="absolute right-0 mt-2 w-48 bg-background text-primary rounded shadow-lg hidden"
-                                id="dropdownMenu">
-                                {{-- <a href="{{ route('profile') }}"
-                                    class="block px-4 py-2 text-sm hover:bg-primary hover:text-background transition">
-                                    Profil
-                                </a> --}}
-                                <form action="{{ route('logout') }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"
-                                        onclick="return confirm('Apakah Anda yakin ingin keluar?')">
-                                        Keluar
-                                    </button>
-                                </form>
-                            </div>
+                    <div class="relative">
+                        <!-- Trigger Button -->
+                        <button class="hover:underline focus:outline-none focus:ring-2 focus:ring-accent transition"
+                            id="dropdownButton">
+                            {{ Auth::user()->name }}
+                        </button>
+                        <!-- Dropdown Menu -->
+                        <div class="absolute right-0 mt-2 w-48 bg-background text-primary rounded shadow-lg hidden"
+                            id="dropdownMenu">
+                            <form action="{{ route('logout') }}" method="POST">
+                                @csrf
+                                <button type="submit"
+                                    class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"
+                                    onclick="return confirm('Apakah Anda yakin ingin keluar?')">
+                                    Keluar
+                                </button>
+                            </form>
                         </div>
-                    @else
-                        <!-- Login/Register Links -->
-                        <a href="{{ route('login') }}" class="hover:underline hover:text-accent transition">Login</a>
-                        <a href="{{ route('register') }}" class="hover:underline hover:text-accent transition">Daftar</a>
-                    @endif
+                    </div>
                 @else
-                    <!-- Guest Links -->
-                    <a href="{{ route('home') }}" class="hover:underline hover:text-accent transition">Beranda</a>
-                    <a href="{{ route('wahana') }}" class="hover:underline hover:text-accent transition">Wahana</a>
+                    <!-- Login/Register Links -->
                     <a href="{{ route('login') }}" class="hover:underline hover:text-accent transition">Login</a>
                     <a href="{{ route('register') }}" class="hover:underline hover:text-accent transition">Daftar</a>
                 @endauth
             </nav>
         @endif
-
 
         <!-- Mobile Menu Toggle -->
         <button class="md:hidden text-2xl" id="menu-toggle">
@@ -94,7 +81,7 @@
             </form>
         @else
             <a href="{{ route('login') }}" class="block hover:underline">Login</a>
-            <a href="{{ route('register') }}" class="block hover:underline">Daftar</a>
+            <a href="{{ route('register') }}" class="block hover :underline">Daftar</a>
         @endif
     </div>
 </header>

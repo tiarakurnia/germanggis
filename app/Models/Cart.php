@@ -13,7 +13,7 @@ class Cart extends Model
         'user_id',
         'facility_id',
         'quantity',
-        'total_price',
+        'booking_date',
     ];
 
     public function user()

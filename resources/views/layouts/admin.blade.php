@@ -29,17 +29,6 @@
                         </a>
                     </li>
 
-                    <!-- Facilities Menu Item -->
-                    <li class="p-3 hover:bg-gray-700 rounded-md">
-                        <a href="{{ route('admin.facilities.index') }}" class="flex items-center space-x-2">
-                            <svg class="w-5 h-5" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"
-                                viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
-                            </svg>
-                            <span>Fasilitas</span>
-                        </a>
-                    </li>
-
                     <!-- Kategori Menu Item -->
                     <li class="p-3 hover:bg-gray-700 rounded-md">
                         <a href="{{ route('admin.categories.index') }}" class="flex items-center space-x-2">
@@ -48,6 +37,17 @@
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M3 8l7-7 7 7M3 16l7 7 7-7" />
                             </svg>
                             <span>Kategori</span>
+                        </a>
+                    </li>
+
+                    <!-- Facilities Menu Item -->
+                    <li class="p-3 hover:bg-gray-700 rounded-md">
+                        <a href="{{ route('admin.facilities.index') }}" class="flex items-center space-x-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"
+                                viewBox="0 0 24 24" stroke-width="2">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M4 6h16M4 12h16m-7 6h7" />
+                            </svg>
+                            <span>Fasilitas</span>
                         </a>
                     </li>
 
@@ -65,10 +65,10 @@
 
                     <!-- Users Menu Item -->
                     <li class="p-3 hover:bg-gray-700 rounded-md">
-                        <a href="#" class="flex items-center space-x-2">
+                        <a href="{{ route('admin.users.index') }}" class="flex items-center space-x-2">
                             <svg class="w-5 h-5" fill="none" stroke="currentColor" xmlns="http://www.w3.org/2000/svg"
                                 viewBox="0 0 24 24" stroke-width="2">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4 v16m8-8H4" />
                             </svg>
                             <span>Users</span>
                         </a>

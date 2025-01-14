@@ -1,46 +1,50 @@
 <?php
 
 namespace App\Http\Controllers;
+use App\Models\User; // Pastikan untuk mengimpor model User
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Password;
 
 class AuthController extends Controller
 {
+    // Menampilkan form login
     public function showLoginForm()
     {
         return view('auth.login');
     }
 
+    // Proses login
     public function login(Request $request)
-{
-    $request->validate([
-        'email' => 'required|email',
-        'password' => 'required',
-    ]);
+    {
+        $request->validate([
+            'email' => 'required|email',
+            'password' => 'required',
+        ]);
 
-    if (Auth::attempt($request->only('email', 'password'))) {
-        // Ambil data user yang sedang login
-        $user = Auth::user();
+        // Mencoba untuk login
+        if (Auth::attempt($request->only('email', 'password'))) {
+            // Ambil data user yang sedang login
+            $user = Auth::user();
 
-        if ($user->role == 'admin') {
-            // Jika user adalah admin, arahkan ke dashboard admin
-            return redirect()->route('admin.dashboard')->with('success', 'Login berhasil! Selamat datang Admin.');
+            if ($user->role == 'admin') {
+                // Jika user adalah admin, arahkan ke dashboard admin
+                return redirect()->route('admin.dashboard')->with('success', 'Login berhasil! Selamat datang Admin.');
+            }
+
+            // Jika bukan admin, arahkan ke halaman utama
+            return redirect()->intended(route('home'))->with('success', 'Login berhasil!');
         }
 
-        // Jika bukan admin, arahkan ke halaman utama
-        return redirect()->intended(route('home'))->with('success', 'Login berhasil!');
+        return back()->withErrors(['email' => 'Email atau password salah.']);
     }
 
-    return back()->withErrors(['email' => 'Email atau password salah.']);
-}
-
-
+    // Menampilkan form registrasi
     public function showRegisterForm()
     {
         return view('auth.register');
     }
 
+    // Proses registrasi
     public function register(Request $request)
     {
         $request->validate([
@@ -50,34 +54,20 @@ class AuthController extends Controller
         ]);
         
         // Menambahkan role di sini, 'admin' bisa diganti dengan 'user'
-        $user = \App\Models\User::create([
+        $user = User::create([
             'name' => $request->name,
             'email' => $request->email,
             'password' => bcrypt($request->password), // Password di-hash menggunakan Bcrypt
-            'role' => 'user',
+            'role' => 'user', // Default role adalah user
         ]);
 
+        // Login otomatis setelah registrasi
         Auth::login($user);
 
         return redirect(route('home'))->with('success', 'Pendaftaran berhasil! Selamat datang.');
-       }
-
-    public function showForgotPasswordForm()
-    {
-        return view('auth.passwords.email');
     }
 
-    public function sendResetLink(Request $request)
-    {
-        $request->validate(['email' => 'required|email']);
-
-        $status = Password::sendResetLink($request->only('email'));
-
-        return $status === Password::RESET_LINK_SENT
-            ? back()->with('success', 'Tautan reset password telah dikirim ke email Anda.')
-            : back()->withErrors(['email' => 'Gagal mengirim tautan reset password.']);
-    }
-
+    // Proses logout
     public function logout()
     {
         Auth::logout();

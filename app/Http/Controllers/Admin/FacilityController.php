@@ -9,64 +9,131 @@ use App\Http\Controllers\Controller;
 
 class FacilityController extends Controller
 {
+    // Menampilkan daftar fasilitas
     public function index()
     {
-        $facilities = Facility::with('category')->get();
-        return view('admin.facilities.index', compact('facilities'));
+        $facilities = Facility::with('category')->get(); // Mengambil semua fasilitas beserta kategori
+        return view('admin.facilities.index', compact('facilities')); // Mengembalikan view dengan data fasilitas
     }
 
+    // Menampilkan form untuk menambahkan fasilitas
     public function create()
     {
-        $categories = Category::all();
-        return view('admin.facilities.create', compact('categories'));
+        $categories = Category::all(); // Mengambil semua kategori
+        return view('admin.facilities.create', compact('categories')); // Mengembalikan view untuk membuat fasilitas
     }
 
+    // Menyimpan fasilitas baru
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required|string|max:255', // Validasi input
+            'category_id' => 'required|exists:categories,id', // Validasi kategori
+            'description' => 'nullable|string', // Validasi deskripsi
+            'price' => 'required|numeric', // Validasi harga
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
         ]);
 
-        $path = $request->file('image') ? $request->file('image')->store('facilities', 'public') : null;
+        $imagePath = null;
 
-        Facility::create(array_merge($request->all(), ['image' => $path]));
+        // Jika ada file gambar yang diupload
+        if ($request->hasFile('image')) {
+            // Mengambil file gambar
+            $image = $request->file('image');
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility created successfully.');
+            // Menggunakan GD untuk memproses gambar
+            $img = imagecreatefromstring(file_get_contents($image->getRealPath()));
+            if ($img) {
+                // Mengubah ukuran gambar
+                $width = imagesx($img);
+                $height = imagesy($img);
+                $newWidth = 800;
+                $newHeight = ($height / $width) * $newWidth;
+
+                $resizedImg = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresampled($resizedImg, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+                // Menyimpan gambar ke dalam string base64
+                ob_start();
+                imagejpeg($resizedImg, null, 75); // Mengatur kualitas JPEG
+                $imageData = ob_get_contents();
+                ob_end_clean();
+
+                $imagePath = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode($imageData);
+
+                // Menghancurkan gambar untuk membebaskan memori
+                imagedestroy($img);
+                imagedestroy($resizedImg);
+            }
+        }
+
+        // Membuat fasilitas baru
+        Facility::create(array_merge($request->all(), ['image' => $imagePath]));
+
+        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil ditambahkan!'); // Redirect dengan pesan sukses
     }
 
+    // Menampilkan form untuk mengedit fasilitas
     public function edit(Facility $facility)
     {
-        $categories = Category::all();
-        return view('admin.facilities.edit', compact('facility', 'categories'));
+        $categories = Category::all(); // Mengambil semua kategori
+        return view('admin.facilities.edit', compact('facility', 'categories')); // Mengembalikan view untuk mengedit fasilitas
     }
 
     public function update(Request $request, Facility $facility)
     {
         $request->validate([
-            'name' => 'required',
-            'category_id' => 'required|exists:categories,id',
-            'description' => 'nullable',
-            'price' => 'required|numeric',
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
+            'name' => 'required|string|max:255', // Validasi input
+            'category_id' => 'required|exists:categories,id', // Validasi kategori
+            'description' => 'nullable|string', // Validasi deskripsi
+            'price' => 'required|numeric', // Validasi harga
+            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
         ]);
 
-        $path = $facility->image;
+        // Mengambil path gambar yang ada
+        $imagePath = $facility->image;
+
+        // Jika ada file gambar yang diupload
         if ($request->hasFile('image')) {
-            $path = $request->file('image')->store('facilities', 'public');
+            // Mengambil file gambar
+            $image = $request->file('image');
+
+            // Menggunakan GD untuk memproses gambar
+            $img = imagecreatefromstring(file_get_contents($image->getRealPath()));
+            if ($img) {
+                // Mengubah ukuran gambar
+                $width = imagesx($img );
+                $height = imagesy($img);
+                $newWidth = 800;
+                $newHeight = ($height / $width) * $newWidth;
+
+                $resizedImg = imagecreatetruecolor($newWidth, $newHeight);
+                imagecopyresampled($resizedImg, $img, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+                // Menyimpan gambar ke dalam string base64
+                ob_start();
+                imagejpeg($resizedImg, null, 75); // Mengatur kualitas JPEG
+                $imageData = ob_get_contents();
+                ob_end_clean();
+
+                $imagePath = 'data:' . $image->getClientMimeType() . ';base64,' . base64_encode($imageData);
+
+                // Menghancurkan gambar untuk membebaskan memori
+                imagedestroy($img);
+                imagedestroy($resizedImg);
+            }
         }
 
-        $facility->update(array_merge($request->all(), ['image' => $path]));
+        // Memperbarui fasilitas
+        $facility->update(array_merge($request->all(), ['image' => $imagePath]));
 
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility updated successfully.');
+        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil diperbarui!'); // Redirect dengan pesan sukses
     }
 
+    // Menghapus fasilitas
     public function destroy(Facility $facility)
     {
-        $facility->delete();
-        return redirect()->route('admin.facilities.index')->with('success', 'Facility deleted successfully.');
+        $facility->delete(); // Menghapus fasilitas
+        return redirect()->route('admin.facilities.index')->with('success', 'Fasilitas berhasil dihapus!'); // Redirect dengan pesan sukses
     }
 }

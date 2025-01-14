@@ -5,48 +5,52 @@
 @section('content')
     <div class="container mx-auto py-8">
         <h1 class="text-3xl font-semibold mb-4">Edit Fasilitas</h1>
-
-        <!-- Form untuk Edit Fasilitas -->
         <form action="{{ route('admin.facilities.update', $facility->id) }}" method="POST" enctype="multipart/form-data"
             class="space-y-4">
             @csrf
-            @method('PUT') <!-- Menandakan bahwa ini adalah permintaan UPDATE -->
+            @method('PUT')
 
-            <!-- Nama Fasilitas -->
             <div>
                 <label for="name" class="block text-lg font-medium text-gray-700">Nama Fasilitas</label>
                 <input type="text" name="name" id="name" value="{{ $facility->name }}"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                @error('name')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
-            <!-- Kategori -->
             <div>
                 <label for="category_id" class="block text-lg font-medium text-gray-700">Kategori</label>
-                <select name="category_id" id="category_id"
+                <select name="category_id" id=" category_id"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
                     @foreach ($categories as $category)
                         <option value="{{ $category->id }}" {{ $facility->category_id == $category->id ? 'selected' : '' }}>
-                            {{ $category->name }}
-                        </option>
+                            {{ $category->name }}</option>
                     @endforeach
                 </select>
+                @error('category_id')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
-            <!-- Harga -->
             <div>
                 <label for="price" class="block text-lg font-medium text-gray-700">Harga</label>
                 <input type="number" name="price" id="price" value="{{ $facility->price }}"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                @error('price')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
-            <!-- Deskripsi -->
             <div>
                 <label for="description" class="block text-lg font-medium text-gray-700">Deskripsi</label>
                 <textarea name="description" id="description"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">{{ $facility->description }}</textarea>
+                @error('description')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
             </div>
 
-            <!-- Gambar -->
             <div>
                 <label for="image" class="block text-lg font-medium text-gray-700">Gambar</label>
                 <input type="file" name="image" id="image"

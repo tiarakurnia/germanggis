@@ -12,13 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('carts', function (Blueprint $table) {
-            $table->id();
-            $table->foreignId('user_id')->constrained()->onDelete('cascade');
-            $table->foreignId('facilities_id')->constrained()->onDelete('cascade');
-            $table->integer('quantity')->default(1);
-            $table->decimal('total_price', 10, 2);
-            $table->date('date')->after('facilities_id');
-            $table->timestamps();
+            $table->id(); // Auto-incrementing ID
+            $table->foreignId('user_id')->constrained('users'); // Foreign key to users
+            $table->foreignId('facility_id')->constrained('facilities'); // Foreign key to facilities
+            $table->integer('quantity'); // Quantity in the cart
+            $table->timestamps(); // Created at and updated at
         });
     }
 
