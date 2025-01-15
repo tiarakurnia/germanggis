@@ -79,6 +79,7 @@ class CartController extends Controller
     public function checkout(Request $request)
     {
         // Setup Midtrans
+        \Log::info('Data diterima dari client: ', $request->all());
         \Midtrans\Config::$serverKey = config('midtrans.serverKey');
         \Midtrans\Config::$isProduction = config('midtrans.isProduction');
         \Midtrans\Config::$isSanitized = config('midtrans.isSanitized');
