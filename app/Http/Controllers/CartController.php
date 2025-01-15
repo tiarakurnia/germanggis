@@ -89,6 +89,8 @@ class CartController extends Controller
         $firstName = $nameParts[0];
         $lastName = isset($nameParts[1]) ? $nameParts[1] : '';
 
+        $cartItems = Cart::with('facility')->where('user_id', Auth::id())->get();
+
         // Menyiapkan detail transaksi
         $transactionDetails = [
             'order_id' => 'ORDER-' . uniqid(),
@@ -97,8 +99,8 @@ class CartController extends Controller
 
         // Menyiapkan detail item
         $itemDetails = [];
-        foreach ($request->items as $item) {
-            $facility = Facility::find($item['facility_id']);
+        foreach ($cartItems as $item) {
+            $facility = $item->facility;
         
             // Pastikan fasilitas ditemukan
             if (!$facility) {
@@ -107,10 +109,23 @@ class CartController extends Controller
         
             $itemDetails[] = [
                 'id' => uniqid(),
-                'price' => $item['price'],
-                'quantity' => $item['quantity'],
-                'name' => $facility->name, // Mengambil nama dari database
+                'price' => $facility->price, // Menggunakan harga dari fasilitas
+                'quantity' => $item->quantity,
+                'name' => $facility->name,
             ];
+        }
+        // Simpan pesanan ke database
+        foreach ($cartItems as $item) {
+            $facility = $item->facility;
+            Order::create([
+                'user_id' => Auth::id(),
+                'facility_id' => $item->facility_id,
+                'price' => $facility->price,
+                'quantity' => $item->quantity,
+                'total' => $facility->price * $item->quantity,
+                'status' => 'pending',
+                'booking_date' => $item->booking_date,
+            ]);
         }
     
         // Menyiapkan detail pelanggan
@@ -130,26 +145,6 @@ class CartController extends Controller
         try {
             // Dapatkan Snap Token
             $snapToken = Snap::getSnapToken($params);
-
-            // Simpan pesanan ke database
-            foreach ($request->items as $item) {
-                // Ambil fasilitas berdasarkan ID
-                $facility = Facility::find($item['facility_id']);
-
-                // Pastikan fasilitas ditemukan
-                if (!$facility) {
-                    return response()->json(['error' => 'Fasilitas tidak ditemukan.'], 404);
-                }
-                Order::create([
-                    'user_id' => Auth::id(), // Menyimpan ID pengguna
-                    'facility_id' => $item['facility_id'], // Menyimpan ID fasilitas
-                    'price' => $item['price'],
-                    'quantity' => $item['quantity'],
-                    'total' => $item['price'] * $item['quantity'],
-                    'status' => 'pending',
-                    'booking_date' => $item['booking_date'], // Simpan tanggal pemesanan
-                ]);
-            }
 
             // Mengembalikan Snap Token sebagai respons JSON
             return response()->json(['snapToken' => $snapToken]);

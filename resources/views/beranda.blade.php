@@ -43,8 +43,10 @@
                 <p class="text-lg mb-6">
                     Rasakan keindahan alam, petualangan seru, dan pengalaman tak terlupakan bersama kami!
                 </p>
-                <a href="/wahana"
-                    class="bg-background text-primary px-6 py-3 rounded-lg shadow-lg hover:bg-primary hover:text-background transition duration-300">
+                <a href="{{ Auth::check() ? route('wahana') : route('login') }}"
+                    class="bg-background
+                    text-primary px-6 py-3 rounded-lg shadow-lg hover:bg-primary hover:text-background transition
+                    duration-300">
                     Jelajahi Wahana
                 </a>
             </div>
@@ -100,11 +102,12 @@
         <!-- Deskripsi -->
         <p class="text-lg text-gray-700">Pesan tiket sekarang dan nikmati berbagai aktivitas seru di Wisata Germanggis.</p>
         <!-- Tombol -->
-        <a href="/fasilitas"
+        <a href="{{ Auth::check() ? route('fasilitas') : route('login') }}"
             class="bg-primary text-white px-8 py-4 rounded-lg shadow-lg hover:bg-white hover:text-primary transition duration-300 transform hover:scale-105 hover:shadow-xl">
             Pesan Tiket Sekarang
         </a>
     </section>
+
 
     <!-- Map Section -->
     <section class="py-16 bg-primary text-background" data-aos="fade-up" data-aos-duration="1000" data-aos-delay="800">

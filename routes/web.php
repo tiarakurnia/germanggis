@@ -23,23 +23,11 @@ Route::get('/', [HomeController::class, 'index'])->name('home');
 Route::get('/wahana', [WahanaController::class, 'index'])->name('wahana');
 Route::get('/category/{slug}', [FacilityController::class, 'show'])->name('categories.show');
 
-// Rute Authentication
-// Route::middleware('guest')->group(function () {
-//     Route::get('/login', [AuthController::class, 'showLoginForm'])->name('login');
-//     Route::post('/login', [AuthController::class, 'login']);
-//     Route::get('/register', [AuthController::class, 'showRegisterForm'])->name('register');
-//     Route::post('/register', [AuthController::class, 'register']);
-//     Route::get('/forgot-password', [AuthController::class, 'showForgotPasswordForm'])->name('password.request');
-//     Route::post('/forgot-password', [AuthController::class, 'sendResetLink'])->name('password.email');
-// });
-
 // Rute Logout
 Route::middleware('auth')->post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rute untuk halaman keranjang
+// // Rute untuk halaman keranjang
 Route::get('/keranjang', [CartController::class, 'index'])->name('keranjang');
-
-Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.process');
 
 //Rute Sukses
 Route::get('/checkout/success', [CartController::class, 'checkout'])->name('checkout.success');
@@ -95,11 +83,15 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
 
 Route::prefix('cart')->name('cart.')->group(function () {
     Route::get('/', [CartController::class, 'index'])->name('index'); // Menampilkan keranjang
-    Route::post('/add', [CartController::class, 'addItem'])->name('add'); // Menambahkan item ke keranjang
+    Route::post('/add', [CartController::class, 'add'])->name('add'); // Menambahkan item ke keranjang
     Route::delete('/remove/{id}', [CartController::class, 'removeItem'])->name('remove'); // Menghapus item dari keranjang
     Route::post('/clear', [CartController::class, 'clearCart'])->name('clear'); // Mengosongkan keranjang
 });
 
+
 // Rute untuk halaman fasilitas
 Route::get('/fasilitas', [FacilityController::class, 'index'])->name('fasilitas');
+
+// Rute untuk cart
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
+Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.process');
