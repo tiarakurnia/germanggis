@@ -120,7 +120,13 @@
                 .then(data => {
                     console.log(data);
                     if (data.success) {
-                        alert(`${name} berhasil ditambahkan ke keranjang!`);
+                        Swal.fire({
+                            title: "",
+                            text: "Item Berhasil dimasukan kedalam keranjang",
+                            icon: "success",
+                            timer: 2000,
+                            showConfirmButton: false
+                        })
                     } else {
                         alert('Gagal menyimpan ke keranjang. Silakan coba lagi.');
                     }

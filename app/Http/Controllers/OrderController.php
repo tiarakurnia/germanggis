@@ -21,7 +21,7 @@ class OrderController extends Controller
 
         // Mengambil fasilitas berdasarkan ID
         $facility = Facility::find($validated['facility_id']);
-        
+
         // Menghitung total harga
         $totalPrice = $validated['quantity'] * $facility->price;
 
@@ -40,10 +40,13 @@ class OrderController extends Controller
 
     public function index()
     {
-        // Mengambil semua pesanan dengan relasi user dan facility
-        $orders = Order::with('user', 'facility')->latest()->get();
+         // Mengambil semua pesanan milik pengguna yang sedang login
+        $orders = Order::where('user_id', Auth::id()) // Filter berdasarkan user_id
+                ->with('facility') // Menggunakan eager loading untuk relasi ke facility
+                ->latest()
+                ->get();
 
-        // Mengembalikan view dengan data pesanan
-        return view('orders.index', compact('orders')); // Pastikan untuk menyesuaikan nama view
+        // Mengembalikan view dengan data pesanan pengguna
+        return view('pesanan', compact('orders')); // Pastikan nama view sesuai
     }
 }

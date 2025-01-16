@@ -104,15 +104,10 @@
                     return response.json();
                 })
                 .then(data => {
-                    console.log(data); // Log respons untuk melihat apa yang diterima
-                    if (data.snapToken) {
-                        const jsonData = JSON.parse(data);
+                    if (data['snapToken']) {
                         // Inisialisasi pembayaran dengan Snap Midtrans
-                        window.snap.pay(jsonData.snapToken, {
+                        window.snap.pay(data['snapToken'], {
                             onSuccess: function(result) {
-                                console.log('Success:', result);
-                                // Lakukan sesuatu setelah pembayaran berhasil (misalnya, redirect ke halaman sukses)
-
                                 // Kosongkan keranjang
                                 clearCart();
 
@@ -129,13 +124,16 @@
                             onPending: function(result) {
                                 alert('Pembayaran pending. Mohon selesaikan pembayaran Anda.');
                                 console.log('Pending:', result);
+                                location.reload(); // Refresh halaman
                             },
                             onError: function(result) {
                                 alert('Terjadi kesalahan dalam proses pembayaran.');
                                 console.error('Error:', result);
+                                location.reload(); // Refresh halaman
                             },
                             onClose: function() {
                                 alert('Anda menutup popup tanpa menyelesaikan pembayaran.');
+                                location.reload(); // Refresh halaman
                             }
                         });
                     } else {

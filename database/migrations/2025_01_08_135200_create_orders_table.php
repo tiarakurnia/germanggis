@@ -15,11 +15,11 @@ return new class extends Migration
             $table->id(); // Auto-incrementing ID
             $table->foreignId('user_id')->constrained('users'); // Foreign key to users
             $table->foreignId('facility_id')->constrained('facilities'); // Foreign key to facilities
-            $table->foreignId('name')->constrained('facilities'); // Facility name
+            $table->text('name'); // Facility name
             $table->decimal('price', 10, 2); // Price of the facility
             $table->integer('quantity'); // Quantity ordered
             $table->decimal('total', 10, 2); // Total price
-            $table->dateTime('order_date'); // Order date
+            $table->string('order_date'); // Order date
             $table->string('image')->nullable(); // Image of the facility
             $table->timestamps(); // Created at and updated at
         });

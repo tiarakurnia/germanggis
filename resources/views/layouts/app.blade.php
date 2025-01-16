@@ -22,7 +22,6 @@
     <main class="container mx-auto px-4 py-6">
         @yield('content')
     </main>
-
     <!-- Footer -->
     @include('components.footer')
 

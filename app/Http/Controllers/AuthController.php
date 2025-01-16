@@ -61,10 +61,8 @@ class AuthController extends Controller
             'role' => 'user', // Default role adalah user
         ]);
 
-        // Login otomatis setelah registrasi
-        Auth::login($user);
-
-        return redirect(route('home'))->with('success', 'Pendaftaran berhasil! Selamat datang.');
+        // Redirect ke halaman login setelah registrasi berhasil
+        return redirect()->route('login')->with('success', 'Pendaftaran berhasil! Silakan login.');
     }
 
     // Proses logout

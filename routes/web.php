@@ -55,8 +55,8 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('admin.dashboard');
 
     // Rute untuk pengguna
-    Route::get('users', [ UserController::class, 'index'])->name('admin.users.index');
-    Route::delete('users',[UserController::class, 'destroy'])->name('admin.users.destroy');
+    Route::get('users', [UserController::class, 'index'])->name('admin.users.index');
+    Route::delete('users', [UserController::class, 'destroy'])->name('admin.users.destroy');
 
     // Rute untuk fasilitas
     Route::get('facilities', [AdminFacilityController::class, 'index'])->name('admin.facilities.index');
@@ -75,8 +75,9 @@ Route::group(['prefix' => 'admin', 'middleware' => 'auth'], function () {
     Route::delete('categories/{category}', [CategoryController::class, 'destroy'])->name('admin.categories.destroy');
 
     // Rute untuk pesanan
-    Route::get('orders', [ AdminOrderController::class, 'index'])->name('admin.orders.index');
-
+    Route::get('orders', [AdminOrderController::class, 'index'])->name('admin.orders.index');
+    Route::get('orders/{id}', [AdminOrderController::class, 'show'])->name('admin.orders.show');
+    Route::post('orders/{id}/confirm', [AdminOrderController::class, 'store'])->name('admin.orders.confirm');
 });
 
 // untuk role user

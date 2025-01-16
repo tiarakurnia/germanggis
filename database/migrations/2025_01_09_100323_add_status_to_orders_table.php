@@ -12,7 +12,7 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('orders', function (Blueprint $table) {
-            //
+            $table->string('status');
         });
     }
 
@@ -23,6 +23,7 @@ return new class extends Migration
     {
         Schema::table('orders', function (Blueprint $table) {
            $table->enum('status', ['pending', 'completed'])->default('pending')->after('image');
+           $table->dropColumn('status');
         });
     }
 };

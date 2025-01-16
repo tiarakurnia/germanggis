@@ -21,10 +21,16 @@ class OrderController extends Controller
     }
 
     // Konfirmasi pesanan
-    public function confirm(Order $order)
+    public function store($id)
     {
+        $data = Order::find($id);
+
+        if (empty($data)) {
+            # code...
+            return abort(404);
+        }
         // Update status pesanan menjadi 'confirmed'
-        $order->update([
+        $data->update([
             'status' => 'confirmed',
             'updated_at' => now(), // Memastikan waktu pembaruan juga diperbarui
         ]);

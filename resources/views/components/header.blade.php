@@ -34,9 +34,9 @@
                             id="dropdownMenu">
                             <form action="{{ route('logout') }}" method="POST">
                                 @csrf
-                                <button type="submit"
+                                <button type="button"
                                     class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"
-                                    onclick="return confirm('Apakah Anda yakin ingin keluar?')">
+                                    id="logout-btn">
                                     Keluar
                                 </button>
                             </form>
@@ -73,9 +73,9 @@
             {{-- <a href="{{ route('profile') }}" class="block hover:underline">Profil</a> --}}
             <form action="{{ route('logout') }}" method="POST">
                 @csrf
-                <button type="submit"
+                <button type="button"
                     class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"
-                    onclick="return confirm('Apakah Anda yakin ingin keluar?')">
+                    id="logout-btn">
                     Keluar
                 </button>
             </form>
@@ -114,5 +114,24 @@
                 dropdownMenu.classList.add('hidden');
             });
         }
+
+        document.getElementById('logout-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            Swal.fire({
+                title: 'Konfirmasi Logout',
+                text: 'Apakah Anda yakin ingin keluar?',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Ya, Keluar',
+                cancelButtonText: 'Batal',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Jika "Ya, Keluar" dipilih, submit form logout
+                    document.getElementById('logout-form').submit();
+                }
+            });
+        });
     </script>
 @endpush
