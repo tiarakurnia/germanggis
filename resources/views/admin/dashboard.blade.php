@@ -23,37 +23,5 @@
             <p class="text-sm">{{ $newOrders }}</p>
         </div>
     </div>
-
-    <div class="mt-8">
-        <h2 class="text-xl font-bold mb-4">Grafik Pembelian Bulanan</h2>
-        <canvas id="salesChart"></canvas>
-    </div>
 @endsection
 
-@section('scripts')
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        const ctx = document.getElementById('salesChart').getContext('2d');
-        const salesChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: @json($months), // Bulan
-                datasets: [{
-                    label: 'Total Pembelian',
-                    data: @json($salesData), // Data penjualan
-                    borderColor: 'rgba(75, 192, 192, 1)',
-                    backgroundColor: 'rgba(75, 192, 192, 0.2)',
-                    borderWidth: 2,
-                }]
-            },
-            options: {
-                responsive: true,
-                scales: {
-                    y: {
-                        beginAtZero: true
-                    }
-                }
-            }
-        });
-    </script>
-@endsection

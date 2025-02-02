@@ -25,7 +25,10 @@ class CategoryController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255', // Validasi input
+            'name' => 'required|unique:categories,name',
+        ], [
+            'name.required' => 'Nama kategori wajib diisi.',
+            'name.unique' => 'Nama kategori sudah ada, silakan gunakan nama lain.',
         ]);
 
         // Membuat kategori baru
@@ -47,6 +50,8 @@ class CategoryController extends Controller
     {
         $request->validate([
             'name' => 'required|string|max:255', // Validasi input
+        ],[
+            'name.required' => 'Nama kategori wajib diisi.',
         ]);
 
         // Memperbarui kategori dengan nama baru

@@ -32,7 +32,7 @@
                         <!-- Dropdown Menu -->
                         <div class="absolute right-0 mt-2 w-48 bg-background text-primary rounded shadow-lg hidden"
                             id="dropdownMenu">
-                            <form action="{{ route('logout') }}" method="POST">
+                            <form id="logout-form" action="{{ route('logout') }}" method="POST">
                                 @csrf
                                 <button type="button"
                                     class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"
@@ -71,7 +71,7 @@
         <!-- Authentication -->
         @if (Auth::check())
             {{-- <a href="{{ route('profile') }}" class="block hover:underline">Profil</a> --}}
-            <form action="{{ route('logout') }}" method="POST">
+            <form id="logout-form" action="{{ route('logout') }}" method="POST">
                 @csrf
                 <button type="button"
                     class="block w-full text-left px-4 py-2 text-sm hover:bg-primary hover:text-background transition"

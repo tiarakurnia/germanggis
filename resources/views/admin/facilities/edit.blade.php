@@ -55,10 +55,14 @@
                 <label for="image" class="block text-lg font-medium text-gray-700">Gambar</label>
                 <input type="file" name="image" id="image"
                     class="mt-1 block w-full px-4 py-2 border rounded-lg focus:ring-2 focus:ring-blue-500 focus:outline-none">
+                @error('image')
+                    <span class="text-red-500 text-sm">{{ $message }}</span>
+                @enderror
                 @if ($facility->image)
                     <p class="mt-2 text-gray-600">Gambar Saat Ini:</p>
                     <img src="{{ asset($facility->image) }}" alt="{{ $facility->name }}" class="mt-2 w-48">
                 @endif
+
             </div>
 
             <button type="submit"
@@ -66,3 +70,12 @@
         </form>
     </div>
 @endsection
+
+@if ($errors->any())
+    <script>
+        // set waktu refresh 1 detik
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000); // Refresh halaman setelah 1 detik
+    </script>
+@endif

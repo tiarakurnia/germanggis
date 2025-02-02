@@ -32,7 +32,7 @@ class OrderController extends Controller
             'quantity' => $validated['quantity'],
             'booking_date' => $validated['date'], // Menggunakan 'booking_date' sesuai dengan skema
             'total' => $totalPrice,
-            'status' => 'pending', // Status awal pesanan
+            'status' => 'Pending', // Status awal pesanan
         ]);
 
         return redirect()->back()->with('success', 'Pesanan berhasil dibuat!');

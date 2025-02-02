@@ -102,4 +102,30 @@ class MidtransController extends Controller
 
         return response()->json(['status' => 'OK']);
     }
+    public function callback(Request $request)
+    {
+        // Ambil notifikasi dari Midtrans
+        $notif = new Notification();
+
+        // Ambil order berdasarkan ID yang dikirim dari Midtrans
+        $order = Order::where('id', $notif->order_id)->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order tidak ditemukan'], 404);
+        }
+
+        // Cek status transaksi dari Midtrans
+        if ($notif->transaction_status == 'settlement') {
+            // Pembayaran sukses, ubah status pesanan menjadi "confirmed"
+            $order->update(['status' => 'confirmed']);
+        } elseif ($notif->transaction_status == 'pending') {
+            // Jika masih pending, biarkan status tetap "pending"
+            $order->update(['status' => 'pending']);
+        } elseif (in_array($notif->transaction_status, ['cancel', 'expire', 'failure'])) {
+            // Jika gagal, batalkan pesanan
+            $order->update(['status' => 'canceled']);
+        }
+
+        return response()->json(['message' => 'Status pesanan diperbarui']);
+    }
 }

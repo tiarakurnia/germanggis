@@ -23,3 +23,12 @@
         </form>
     </div>
 @endsection
+
+@if ($errors->any())
+    <script>
+        // set waktu refresh 1 detik
+        setTimeout(() => {
+            window.location.reload();
+        }, 1000); // Refresh halaman setelah 1 detik
+    </script>
+@endif

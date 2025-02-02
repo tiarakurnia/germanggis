@@ -30,16 +30,49 @@
                         <td class="px-4 py-2">{{ $user->email }}</td>
                         <td class="px-4 py-2">{{ $user->created_at->format('Y-m-d') }}</td>
                         <td class="px-4 py-2 text-center">
-                            <form action="{{ route('admin.users.destroy', $user->id) }}" method="POST" class="inline">
-                                @csrf
-                                @method('DELETE')
-                                <button type="submit" class="text-red-500 hover:underline"
-                                    onclick="return confirm('Apakah Anda yakin ingin menghapus pengguna ini?')">Hapus</button>
-                            </form>
+                            <button class="text-red-500 hover:underline delete-user" data-id="{{ $user->id }}">
+                                <i class="fas fa-trash-alt"></i>
+                            </button>
                         </td>
                     </tr>
                 @endforeach
             </tbody>
         </table>
+
+        <form id="delete-form" action="" method="POST" style="display: none;">
+            @csrf
+            @method('DELETE')
+        </form>
     </div>
 @endsection
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Tangkap semua tombol hapus
+        const deleteButtons = document.querySelectorAll('.delete-user');
+        const deleteForm = document.getElementById('delete-form');
+
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const userId = this.getAttribute('data-id');
+                const deleteUrl = `{{ route('admin.users.destroy', '') }}/${userId}`;
+
+                Swal.fire({
+                    title: 'Apakah Anda yakin?',
+                    text: "Data yang sudah dihapus tidak dapat dikembalikan!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#d33',
+                    cancelButtonColor: '#3085d6',
+                    confirmButtonText: 'Ya, hapus!',
+                    cancelButtonText: 'Batal'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        deleteForm.action = deleteUrl;
+                        deleteForm.submit();
+                    }
+                });
+            });
+        });
+    });
+</script>

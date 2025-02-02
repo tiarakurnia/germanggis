@@ -27,12 +27,22 @@ class FacilityController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'name' => 'required|string|max:255', // Validasi input
+            'name' => 'required|string|max:255|unique:facilities,name', // Validasi input
             'category_id' => 'required|exists:categories,id', // Validasi kategori
             'description' => 'nullable|string', // Validasi deskripsi
             'price' => 'required|numeric', // Validasi harga
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
-        ]);
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
+        ],[
+            // Pesan error custom
+            'name.unique' => 'Fasilitas sudah ada',
+            'name.required' => 'Nama fasilitas wajib diisi.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'price.required' => 'Harga fasilitas wajib diisi.',
+            'price.numeric' => 'Harga fasilitas harus berupa angka.',
+            'image.required' => 'Gambar wajib diunggah.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Gambar harus dalam format JPEG, PNG, atau JPG.',
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',]);
 
         $imagePath = null;
 
@@ -87,8 +97,16 @@ class FacilityController extends Controller
             'category_id' => 'required|exists:categories,id', // Validasi kategori
             'description' => 'nullable|string', // Validasi deskripsi
             'price' => 'required|numeric', // Validasi harga
-            'image' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
-        ]);
+            'image' => 'required|image|mimes:jpeg,png,jpg|max:2048', // Validasi gambar
+        ],[
+            'name.required' => 'Nama fasilitas wajib diisi.',
+            'category_id.required' => 'Kategori wajib dipilih.',
+            'price.required' => 'Harga fasilitas wajib diisi.',
+            'price.numeric' => 'Harga fasilitas harus berupa angka.',
+            'image.required' => 'Gambar wajib diunggah.',
+            'image.image' => 'File yang diunggah harus berupa gambar.',
+            'image.mimes' => 'Gambar harus dalam format JPEG, PNG, atau JPG.',
+            'image.max' => 'Ukuran gambar tidak boleh lebih dari 2MB.',]);
 
         // Mengambil path gambar yang ada
         $imagePath = $facility->image;

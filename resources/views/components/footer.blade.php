@@ -27,6 +27,9 @@
                 Kec. Cilongok, Kabupaten Banyumas<br>
                 Jawa Tengah 53162
             </p>
+            <a href="https://wa.me/628816735135" target="_blank">
+                <button class="bg-green-500 text-white px-4 py-2 rounded mt-4">Admin</button>
+            </a>
         </div>
     </div>
 

@@ -36,15 +36,36 @@
                         <td class="px-4 py-2">{{ $order->created_at->format('Y-m-d H:i') }}</td>
                         <td class="px-4 py-2">{{ ucfirst($order->status) }}</td>
                         <td class="px-4 py-2 text-center">
-                            @if ($order->status === 'pending')
-                                <form action="{{ route('admin.orders.confirm', $order->id) }}" method="POST">
-                                    @csrf
-                                    <button type="submit"
-                                        class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">Konfirmasi</button>
-                                </form>
-                            @else
-                                <span class="text-gray-500">Dikonfirmasi</span>
-                            @endif
+                            <div class="flex space-x-2 justify-center items-center">
+                                @if ($order->status === 'pending')
+                                    <!-- Tombol Konfirmasi dan Cancel untuk status Pending -->
+                                    <form action="{{ route('admin.orders.confirm', $order->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+                                            <i class="fas fa-check-circle"></i> Konfirmasi
+                                        </button>
+                                    </form>
+
+                                    <form action="{{ route('admin.orders.cancel', $order->id) }}" method="POST"
+                                        class="mt-2">
+                                        @csrf
+                                        <button type="submit"
+                                            class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-600">
+                                            <i class="fas fa-times-circle"></i> Cancel
+                                        </button>
+                                    </form>
+                                @elseif ($order->status === 'Confirmed')
+                                    <!-- Tombol Selesaikan untuk status Confirmed -->
+                                    <form action="{{ route('admin.orders.complete', $order->id) }}" method="POST">
+                                        @csrf
+                                        <button type="submit"
+                                            class="bg-green-500 text-white px-4 py-2 rounded hover:bg-green-600">
+                                            <i class="fas fa-check"></i> Selesaikan
+                                        </button>
+                                    </form>
+                                @endif
+                            </div>
                         </td>
                     </tr>
                 @endforeach

@@ -106,34 +106,95 @@
                 .then(data => {
                     if (data['snapToken']) {
                         // Inisialisasi pembayaran dengan Snap Midtrans
+                        // window.snap.pay(data['snapToken'], {
+                        //     onSuccess: function(result) {
+                        //         // Kosongkan keranjang
+                        //         clearCart();
+
+                        //         Swal.fire({
+                        //             title: "Pembayaran Berhasil",
+                        //             text: "Terima kasih telah melakukan pembayaran.",
+                        //             icon: "success",
+                        //             timer: 2000,
+                        //             showConfirmButton: false
+                        //         }).then(() => {
+                        //             location.reload(); // Refresh halaman
+                        //         });
+                        //     },
+                        //     onPending: function(result) {
+                        //         alert('Pembayaran pending. Mohon selesaikan pembayaran Anda.');
+                        //         console.log('Pending:', result);
+                        //         location.reload(); // Refresh halaman
+                        //     },
+                        //     onError: function(result) {
+                        //         alert('Terjadi kesalahan dalam proses pembayaran.');
+                        //         console.error('Error:', result);
+                        //         location.reload(); // Refresh halaman
+                        //     },
+                        //     onClose: function() {
+                        //         alert('Anda menutup popup tanpa menyelesaikan pembayaran.');
+                        //         location.reload(); // Refresh halaman
+                        //     }
+                        // }
                         window.snap.pay(data['snapToken'], {
                             onSuccess: function(result) {
-                                // Kosongkan keranjang
-                                clearCart();
-
-                                Swal.fire({
-                                    title: "Pembayaran Berhasil",
-                                    text: "Terima kasih telah melakukan pembayaran.",
-                                    icon: "success",
-                                    timer: 2000,
-                                    showConfirmButton: false
+                                fetch('{{ route('midtrans.callback') }}', { // Panggil endpoint callback
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'settlement',
+                                    })
                                 }).then(() => {
-                                    location.reload(); // Refresh halaman
+                                    Swal.fire({
+                                        title: "Pembayaran Berhasil",
+                                        text: "Terima kasih telah melakukan pembayaran.",
+                                        icon: "success",
+                                        timer: 2000,
+                                        showConfirmButton: false
+                                    }).then(() => {
+                                        location.reload(); // Refresh halaman
+                                    });
                                 });
                             },
                             onPending: function(result) {
-                                alert('Pembayaran pending. Mohon selesaikan pembayaran Anda.');
-                                console.log('Pending:', result);
-                                location.reload(); // Refresh halaman
+                                fetch('{{ route('midtrans.callback') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'pending',
+                                    })
+                                }).then(() => {
+                                    alert('Pembayaran masih pending.');
+                                    location.reload();
+                                });
                             },
                             onError: function(result) {
-                                alert('Terjadi kesalahan dalam proses pembayaran.');
-                                console.error('Error:', result);
-                                location.reload(); // Refresh halaman
+                                fetch('{{ route('midtrans.callback') }}', {
+                                    method: 'POST',
+                                    headers: {
+                                        'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                                        'Content-Type': 'application/json',
+                                    },
+                                    body: JSON.stringify({
+                                        order_id: result.order_id,
+                                        transaction_status: 'failure',
+                                    })
+                                }).then(() => {
+                                    alert('Terjadi kesalahan dalam proses pembayaran.');
+                                    location.reload();
+                                });
                             },
                             onClose: function() {
                                 alert('Anda menutup popup tanpa menyelesaikan pembayaran.');
-                                location.reload(); // Refresh halaman
+                                location.reload();
                             }
                         });
                     } else {

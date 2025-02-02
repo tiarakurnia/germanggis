@@ -13,7 +13,6 @@ class AuthController extends Controller
         return view('auth.login');
     }
 
-    // Proses login
     public function login(Request $request)
     {
         $request->validate([
@@ -21,22 +20,31 @@ class AuthController extends Controller
             'password' => 'required',
         ]);
 
-        // Mencoba untuk login
-        if (Auth::attempt($request->only('email', 'password'))) {
-            // Ambil data user yang sedang login
-            $user = Auth::user();
+        // Periksa apakah email ada di database
+        $user = \App\Models\User::where('email', $request->email)->first();
 
-            if ($user->role == 'admin') {
-                // Jika user adalah admin, arahkan ke dashboard admin
-                return redirect()->route('admin.dashboard')->with('success', 'Login berhasil! Selamat datang Admin.');
-            }
-
-            // Jika bukan admin, arahkan ke halaman utama
-            return redirect()->intended(route('home'))->with('success', 'Login berhasil!');
+        if (!$user) {
+            // Email tidak ditemukan
+            return back()->withErrors(['email' => 'Email salah.'])->withInput();
         }
 
-        return back()->withErrors(['email' => 'Email atau password salah.']);
+        // Periksa apakah password cocok
+        if (!Auth::attempt(['email' => $request->email, 'password' => $request->password])) {
+            return back()->withErrors(['password' => 'Password salah.'])->withInput();
+        }
+
+        // Login berhasil, arahkan user sesuai role
+        $user = Auth::user();
+
+        if ($user->role == 'admin') {
+            // Jika user adalah admin, arahkan ke dashboard admin
+            return redirect()->route('admin.dashboard')->with('success', 'Login berhasil!');
+        }
+
+        // Jika bukan admin, arahkan ke halaman utama
+        return redirect()->intended(route('home'))->with('success', 'Login berhasil!');
     }
+
 
     // Menampilkan form registrasi
     public function showRegisterForm()
@@ -51,6 +59,17 @@ class AuthController extends Controller
             'name' => 'required|string|max:255',
             'email' => 'required|email|unique:users',
             'password' => 'required|confirmed|min:6',
+        ],[
+            // Pesan error kustom
+            'name.required' => 'Nama wajib diisi.',
+            'name.string' => 'Nama harus berupa teks.',
+            'name.max' => 'Nama tidak boleh lebih dari 255 karakter.',
+            'email.required' => 'Email wajib diisi.',
+            'email.email' => 'Format email tidak valid.',
+            'email.unique' => 'Email sudah digunakan, silakan gunakan email lain.',
+            'password.required' => 'Password wajib diisi.',
+            'password.confirmed' => 'Konfirmasi password tidak cocok.',
+            'password.min' => 'Password minimal harus terdiri dari 6 karakter.',
         ]);
         
         // Menambahkan role di sini, 'admin' bisa diganti dengan 'user'
