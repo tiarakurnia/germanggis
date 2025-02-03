@@ -4,7 +4,6 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\AdminController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\WahanaController;
 use App\Http\Controllers\CheckoutController;
@@ -89,7 +88,6 @@ Route::prefix('cart')->name('cart.')->group(function () {
     Route::post('/clear', [CartController::class, 'clearCart'])->name('clear'); // Mengosongkan keranjang
 });
 
-
 // Rute untuk halaman fasilitas
 Route::get('/fasilitas', [FacilityController::class, 'index'])->name('fasilitas');
 
@@ -97,11 +95,7 @@ Route::get('/fasilitas', [FacilityController::class, 'index'])->name('fasilitas'
 Route::post('/cart/add', [CartController::class, 'add'])->name('cart.add');
 Route::post('/checkout', [CartController::class, 'checkout'])->name('checkout.process');
 
-// Callback Midtrans
-Route::post('/midtrans/callback', [MidtransController::class, 'callback'])->name('midtrans.callback');
-
 // Admin menyelesaikan pesanan
 Route::post('/admin/orders/{id}/complete', [AdminOrderController::class, 'complete'])->name('admin.orders.complete');
 Route::post('/admin/orders/{id}/cancel', [AdminOrderController::class, 'cancel'])->name('admin.orders.cancel');
-Route::post('/admin/orders/{id}/confirm', [AdminOrderController::class, 'confirm'])->name('admin.orders.confirm');
 

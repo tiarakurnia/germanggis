@@ -3,8 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Category;
-use App\Models\Facility; // Pastikan untuk mengimpor model Facility
-use App\Models\Cart; // Pastikan untuk mengimpor model Cart
+use App\Models\Facility; 
+use App\Models\Cart; 
 use Illuminate\Http\Request;
 
 class FacilityController extends Controller

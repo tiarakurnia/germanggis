@@ -9,15 +9,19 @@ use Illuminate\Http\Request;
 class OrderController extends Controller
 {
     // Menampilkan daftar pesanan
-    public function index()
+    public function index(Request $request)
     {
+        //parameter sorting dari request, default-nya 'desc' (terbaru ke terlama)
+        $sortOrder = $request->query('sort', 'desc');
+
         // Mengambil semua pesanan dan urutkan berdasarkan status (pending di atas, confirmed di bawah)
         $orders = Order::with('user', 'facility') // Mengambil relasi user dan facility
             ->orderByRaw("FIELD(status, 'Pending') DESC") // Menampilkan 'pending' terlebih dahulu
+            ->orderBy('booking_date', $sortOrder) // Sort berdasarkan booking_date
             ->orderBy('created_at', 'desc') // Pesanan terbaru di atas
             ->get();
 
-        return view('admin.orders.index', compact('orders')); // Mengembalikan view dengan data pesanan
+        return view('admin.orders.index', compact('orders', 'sortOrder')); 
     }
 
     // Konfirmasi pesanan
@@ -36,25 +40,6 @@ class OrderController extends Controller
         ]);
 
         return redirect()->route('admin.orders.index')->with('success', 'Pesanan telah dikonfirmasi!'); // Redirect dengan pesan sukses
-    }
-    public function confirm($id)
-    {
-        // Temukan pesanan berdasarkan ID
-        $order = Order::find($id);
-
-        // Jika pesanan tidak ditemukan, tampilkan 404
-        if (!$order) {
-            return abort(404); 
-        }
-
-        // Update status pesanan menjadi 'Confirmed'
-        $order->update([
-            'status' => 'Confirmed',
-            'updated_at' => now(), // Memastikan waktu pembaruan juga diperbarui
-        ]);
-
-        // Redirect ke halaman daftar pesanan dengan pesan sukses
-        return redirect()->route('admin.orders.index')->with('success', 'Pesanan telah dikonfirmasi!');
     }
 
     public function complete($id)

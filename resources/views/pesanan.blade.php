@@ -30,11 +30,11 @@
                             {{-- Status Pesanan --}}
                             @if ($order->status == 'Canceled')
                                 <p class="text-red-500 font-bold">Pesanan dibatalkan oleh admin</p>
-                                <a href="https://wa.me/628816735135?text=Halo Admin, saya ingin mengajukan refund untuk pesanan saya dengan ID: {{ $order->id }}"
-                                    class="block mt-2 bg-orange-600 text-white py-2 px-4 rounded-lg hover:bg-orange-600">
+                                <a href="https://wa.me/628816735135?text=Halo Admin, saya ingin mengajukan refund"
+                                    class="block mt-2 bg-red-500 text-white py-2 px-4 rounded-lg hover:bg-red-700">
                                     Hubungi Admin untuk Refund
                                 </a>
-                            @elseif ($order->status == 'Pending')
+                            @elseif ($order->status == 'pending')
                                 <button class="mt-4 bg-yellow-500 text-white py-2 px-4 rounded-lg hover:bg-yellow-600">
                                     {{ ucfirst($order->status) }}
                                 </button>
@@ -47,7 +47,6 @@
                                     {{ ucfirst($order->status) }}
                                 </button>
                             @endif
-
                         </div>
                     @endforeach
                 </div>
